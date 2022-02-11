@@ -1,3 +1,17 @@
+const buildHTML = (XHR) => {
+  const item = XHR.response.post;
+  const html = `
+    <div class="post">
+      <div class="post-date">
+        投稿日時：${item.created_at}
+      </div>
+      <div class="post-content">
+        ${item.content}
+      </div>
+    </div>`;
+  return html;
+};
+
 function post (){
   const submit = document.getElementById("submit");   //送信ボタンのHTML要素を取得し変数submitに代入
   submit.addEventListener("click", (e) => {  // addEventListenerメソッドで送信ボタンをクリックした時、を指定
@@ -8,6 +22,16 @@ function post (){
     XHR.open("POST", "/posts", true);  //openメソッドでサーバーサイドにリクエストの内容を指定
     XHR.responseType = "json";  //帰ってくるレスポンスをJSONに指定
     XHR.send(formData);         //formDataを送信
+    XHR.onload = () => {
+      if (XHR.status != 200) {
+        alert(`Error ${XHR.status}: ${XHR.statusText}`);
+        return null;
+      };
+      const list = document.getElementById("list");
+      const formText = document.getElementById("content");
+      list.insertAdjacentHTML("afterend", buildHTML(XHR));
+      formText.value = "";
+    };
   });
 };
 
